@@ -4,7 +4,7 @@ My solutions for Advent of Code 2024, written in Go
 ## Solutions
 |       Day        |      Stars    |
 |------------------|---------------|
-|  [Day 1](day01)  | :star:        |
+|  [Day 1](day01)  | :star: :star: |
 |  [Day 2](day02)  |               |
 |  [Day 3](day03)  |               |
 |  [Day 4](day04)  |               |

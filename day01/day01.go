@@ -15,12 +15,19 @@ import (
 )
 
 
-func main() {
-    task01()
+type Task02Bar struct {
+    num         int
+    value       opts.BarData
 }
 
 
-func task01() {
+func main() {
+    fmt.Printf("Task 01: %d\n", task01())
+    fmt.Printf("Task 02: %d\n", task02())
+}
+
+
+func task01() int {
     f, err := os.Open("input")
     if err != nil {
         panic(err)
@@ -66,7 +73,6 @@ func task01() {
         maxDistance = max(maxDistance, distance)
     }
 
-    // Visualization
     distanceRange := maxDistance - minDistance
     binAmount := 10
     binSize := distanceRange / (binAmount - 1)
@@ -105,5 +111,84 @@ func task01() {
     render.MakeChartSnapshot(bar.RenderContent(), "task01.png")
 
 
-    fmt.Println(totalDistance)
+    return totalDistance
+}
+
+
+func task02() int {
+    f, err := os.Open("input")
+    if err != nil {
+        panic(err)
+    }
+
+    scanner := bufio.NewScanner(f)
+
+    occurences, rightList := make(map[int]int, 0), make([]int, 0)
+    for scanner.Scan() {
+        line := scanner.Text()
+        cols := strings.Split(line, "   ")
+        
+        num0, err := strconv.Atoi(cols[0])
+        if err != nil {
+            panic(err)
+        }
+        num1, err := strconv.Atoi(cols[1])
+        if err != nil {
+            panic(err)
+        }
+
+        occurences[num0] = 0
+        rightList = append(rightList, num1)
+    }
+
+    for _, num := range rightList {
+        if _, ok := occurences[num]; ok {
+            occurences[num] += 1
+        }
+    }
+
+    similarity := 0
+    barData := make([]Task02Bar, 0)
+    for num, count := range occurences {
+        similarity += num * count
+
+        if count != 0 {
+            barData = append(barData, Task02Bar{
+                num: num,
+                value: opts.BarData{Value: count},
+            })
+        }
+    }
+
+    sort.Slice(barData, func(i, j int) bool {
+        return barData[i].value.Value.(int) > barData[j].value.Value.(int)
+    })
+    barNums := make([]int, 0)
+    barValues := make([]opts.BarData, 0)
+    for _, bd := range barData {
+        barNums = append(barNums, bd.num)
+        barValues = append(barValues, bd.value)
+    }
+
+    bar := charts.NewBar()
+    bar.SetGlobalOptions(
+        charts.WithTitleOpts(opts.Title{
+            Title: "Occurences not 0",
+            Subtitle: "Occurences of numbers in left list in right list (excluding 0)",
+        }),
+        charts.WithXAxisOpts(opts.XAxis{
+            AxisLabel: &opts.AxisLabel{
+                Interval: "",
+                Rotate: 60,
+            },
+        }),
+        charts.WithAnimation(false),
+    )
+
+    bar.SetXAxis(barNums).
+        AddSeries("Occurrences", barValues)
+
+    render.MakeChartSnapshot(bar.RenderContent(), "task02.png")
+
+    return similarity
 }

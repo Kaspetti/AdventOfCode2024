@@ -32,6 +32,7 @@ func task01() int {
     if err != nil {
         panic(err)
     }
+    defer f.Close()
 
     scanner := bufio.NewScanner(f)
 
@@ -120,6 +121,7 @@ func task02() int {
     if err != nil {
         panic(err)
     }
+    defer f.Close()
 
     scanner := bufio.NewScanner(f)
 

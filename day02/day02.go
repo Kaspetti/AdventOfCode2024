@@ -69,10 +69,59 @@ func task01() int {
 }
 
 
+func task02() int {
+    f, err := os.Open("input")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    scanner := bufio.NewScanner(f)
+    
+    totalSafe := 0
+
+    for scanner.Scan() {
+        line := scanner.Text()
+        levels := strings.Split(line, " ")
+        levelsInt := make([]int, 0)
+        for _, level := range levels {
+            levelInt, err := strconv.Atoi(level)
+            if err != nil {
+                panic(err)
+            }
+            levelsInt = append(levelsInt, levelInt)
+        }
+
+        direction := getMostCommonDirection(levelsInt)
+    }
+
+    return totalSafe
+}
+
+
 func absI(n int) int {
     if n < 0 {
         return -n
     }
 
     return n
+}
+
+
+func getMostCommonDirection(levels []int) string {
+    downCount := 0
+    upCount := 0
+    for i, level := range levels[1:] {
+        if level > levels[i] {
+            upCount += 1
+        } else if level < levels[i] {
+            downCount += 1
+        }
+    }
+
+    if downCount > upCount {
+        return "down"
+    } else {
+        return "up"
+    }
 }

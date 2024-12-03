@@ -80,6 +80,7 @@ func task02() int {
     
     totalSafe := 0
 
+    lineLoop: 
     for scanner.Scan() {
         line := scanner.Text()
         levels := strings.Split(line, " ")
@@ -91,8 +92,44 @@ func task02() int {
             }
             levelsInt = append(levelsInt, levelInt)
         }
+        
+        validUp, iUp := isValidUp(levelsInt)
+        validDown, iDown := isValidDown(levelsInt)
 
-        direction := getMostCommonDirection(levelsInt)
+        if validUp || validDown {
+            totalSafe += 1
+            continue
+        }
+
+        // Check removing iUp+-
+        for i := iUp-1; i <= iUp+1; i++ {
+            if i < 0 || i >= len(levelsInt) {
+                continue
+            }
+
+            newLevels := make([]int, len(levelsInt))
+            copy(newLevels, levelsInt)
+            newLevels = append(newLevels[:i], newLevels[i+1:]...)
+            if valid, _ := isValidUp(newLevels); valid {
+                totalSafe += 1
+                continue lineLoop
+            }
+        }
+
+        // Check removing iDown+-
+        for i := iDown-1; i <= iDown+1; i++ {
+            if i < 0 || i >= len(levelsInt) {
+                continue
+            }
+
+            newLevels := make([]int, len(levelsInt))
+            copy(newLevels, levelsInt)
+            newLevels = append(newLevels[:i], newLevels[i+1:]...)
+            if valid, _ := isValidDown(newLevels); valid {
+                totalSafe += 1
+                continue lineLoop
+            }
+        }
     }
 
     return totalSafe
@@ -108,20 +145,33 @@ func absI(n int) int {
 }
 
 
-func getMostCommonDirection(levels []int) string {
-    downCount := 0
-    upCount := 0
+func isValidUp(levels []int) (bool, int) {
     for i, level := range levels[1:] {
-        if level > levels[i] {
-            upCount += 1
-        } else if level < levels[i] {
-            downCount += 1
+        if level < levels[i] {
+            return false, i+1
+        }
+
+        diff := level - levels[i]
+        if diff == 0 || absI(diff) > 3 {
+            return false, i+1
         }
     }
 
-    if downCount > upCount {
-        return "down"
-    } else {
-        return "up"
+    return true, -1
+}
+
+
+func isValidDown(levels []int) (bool, int) {
+    for i, level := range levels[1:] {
+        if level > levels[i] {
+            return false, i+1
+        }
+
+        diff := level - levels[i]
+        if diff == 0 || absI(diff) > 3 {
+            return false, i+1
+        }
     }
+
+    return true, -1
 }

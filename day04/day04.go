@@ -70,7 +70,58 @@ func task01() int {
 
 
 func task02() int {
-    panic("unimplemented")
+    f, err := os.Open("input")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    scanner := bufio.NewScanner(f)
+    startPos := make([]coord2D, 0)
+    runeGrid := make([][]rune, 0)
+    for scanner.Scan() {
+        for i, rune := range scanner.Text() {
+            if rune == 'A' {
+                startPos = append(startPos, coord2D{x: i, y: len(runeGrid)})
+            }
+        }
+
+        runeGrid = append(runeGrid, []rune(scanner.Text()))
+    }
+
+    total := 0
+    for _, start := range startPos {
+        if start.x == 0 || start.x == len(runeGrid[0])-1 || start.y == 0 || start.y == len(runeGrid)-1 {
+            continue
+        }
+
+        // Check topleft-bottomright
+        if runeGrid[start.y - 1][start.x - 1] != 'M' && runeGrid[start.y - 1][start.x - 1] != 'S' {
+            continue
+        }
+        if runeGrid[start.y + 1][start.x + 1] != 'M' && runeGrid[start.y + 1][start.x + 1] != 'S' {
+            continue
+        }
+        if runeGrid[start.y - 1][start.x - 1] == runeGrid[start.y + 1][start.x + 1] {
+            continue
+        }
+
+        // Check topright-bottomleft
+        if runeGrid[start.y - 1][start.x + 1] != 'M' && runeGrid[start.y - 1][start.x + 1] != 'S' {
+            continue
+        }
+        if runeGrid[start.y + 1][start.x - 1] != 'M' && runeGrid[start.y + 1][start.x - 1] != 'S' {
+            continue
+        }
+        if runeGrid[start.y - 1][start.x + 1] == runeGrid[start.y + 1][start.x - 1] {
+            continue
+        }
+        
+        total += 1
+    }
+
+
+    return total
 }
 
 

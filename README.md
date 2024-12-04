@@ -5,9 +5,9 @@ My solutions for Advent of Code 2024, written in Go
 |       Day        |      Stars    |
 |------------------|---------------|
 |  [Day 1](day01)  | :star: :star: |
-|  [Day 2](day02)  | :star:        |
+|  [Day 2](day02)  | :star: :star: |
 |  [Day 3](day03)  | :star: :star: |
-|  [Day 4](day04)  |               |
+|  [Day 4](day04)  | :star:        |
 |  [Day 5](day05)  |               |
 |  [Day 6](day06)  |               |
 |  [Day 7](day07)  |               |

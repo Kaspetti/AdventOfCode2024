@@ -97,6 +97,7 @@ func task02() int {
                 if _, ok := rules[key]; ok {
                     update[i], update[j] = update[j], update[i]
                     swapped = true
+                    i = 0
                 }
             }
         }

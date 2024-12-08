@@ -87,7 +87,7 @@ func task01() int {
 
 
 func task02() int {
-    f, err := os.Open("input")
+    f, err := os.Open("sampleinput")
     if err != nil {
         panic(err)
     }
@@ -113,136 +113,64 @@ func task02() int {
         }
     }
 
+    gridWidth := len(grid[0])
+    gridHeight := len(grid)
     total := 0
-    dir := UP
-    guardStart := guardPos
 
+    // Bruteforce check
+    for y := 0; y < gridHeight; y++ {
+        for x := 0; x < gridWidth; x++ {
+            if grid[y][x] != '.' {
+                continue
+            }
+
+            grid[y][x] = '#'
+            if isLoop(guardPos, UP, grid) {
+                total += 1
+            }
+
+            grid[y][x] = '.'
+        }
+    }
+
+    return 0
+}
+
+
+func isLoop(guardPos coord, direction Direction, grid [][]rune) bool {
+    visited := make(map[coord]bool)
+    
     gridWidth := len(grid[0])
     gridHeight := len(grid)
 
-    tested := make(map[coord]map[Direction]bool)
-    added := make(map[coord]bool)
     for {
-        nextCoord := goForward(guardPos, dir, gridWidth, gridHeight)
-        if nextCoord == guardPos {
-            break
+        visited[guardPos] = true
+
+        newCoord := goForward(guardPos, direction, gridWidth, gridHeight)        
+        // We left the grid == not in loop
+        if newCoord == guardPos {
+            return false
         }
 
-        cellInFront := grid[nextCoord.y][nextCoord.x]
+        cellInFront := grid[newCoord.y][newCoord.x]
         if cellInFront == '#' {
-            dir = (dir + 1) % 4
-
+            if newCoord.x == 3 && newCoord.y == 6 {
+                fmt.Println("hai")
+            }
+            direction = (direction + 1) % 4
         }
 
-        nextCoord = goForward(guardPos, dir, gridWidth, gridHeight)
-        if nextCoord == guardPos {
-            break
+        newCoord = goForward(guardPos, direction, gridWidth, gridHeight)
+        if newCoord == guardPos {
+            return false
         }
 
-        if _, ok := tested[guardPos]; !ok {
-            tested[guardPos] = make(map[Direction]bool)
-        }
-
-        if _, ok := tested[guardPos][dir]; !ok {
-            if nextCoord != guardStart {
-                candidate := obstacleToTheRight(guardPos, dir, grid)
-                if candidate {
-                    isLoop := checkForLoop(guardPos, dir, nextCoord, grid)
-                    if _, ok := added[nextCoord]; isLoop && !ok {
-                        added[nextCoord] = true
-                        total += 1
-                    }
-                }
-            }
-        }
-
-
-        tested[guardPos][dir] = true
-        guardPos = nextCoord
-    }
-
-    return total
-}
-
-
-func obstacleToTheRight(c coord, dir Direction, grid [][]rune) bool {
-    switch dir {
-        case UP:
-            y := c.y
-            for x := c.x + 1; x < len(grid[y]); x++ {
-                if grid[y][x] == '#' {
-                    return true
-                }
-            }
-        case DOWN:
-            y := c.y
-            for x := c.x - 1; x >= 0; x-- {
-                if grid[y][x] == '#' {
-                    return true
-                }
-            }
-        case LEFT:
-            x := c.x
-            for y := c.y - 1; y >= 0; y-- {
-                if grid[y][x] == '#' {
-                    return true
-                }
-            }
-        case RIGHT:
-            x := c.x
-            for y := c.y + 1; y < len(grid); y++ {
-                if grid[y][x] == '#' {
-                    return true
-                }
-            }
-    }
-
-    return false
-}
-
-
-func checkForLoop(guardPos coord, dir Direction, newObstacle coord, grid [][]rune) bool {
-    newGrid := make([][]rune, len(grid))
-    for i := range grid {
-        newGrid[i] = make([]rune, len(grid[i]))
-        copy(newGrid[i], grid[i])
-    }
-    newGrid[newObstacle.y][newObstacle.x] = '#'
-
-    visited := make(map[coord]map[Direction]bool)
-    gridWidth := len(grid[0])
-    gridHeight := len(grid)
-
-    for {
-        if _, ok := visited[guardPos][dir]; ok {
+        if visited[guardPos] && visited[newCoord] {
             return true
         }
 
-        if _, ok := visited[guardPos]; !ok {
-            visited[guardPos] = make(map[Direction]bool)
-        }
-
-        visited[guardPos][dir] = true
-
-        nextCoord := goForward(guardPos, dir, gridWidth, gridHeight)
-        if nextCoord == guardPos {
-            break
-        }
-        
-        cellInFront := newGrid[nextCoord.y][nextCoord.x]
-        if cellInFront == '#' {
-            dir = (dir + 1) % 4
-        }
-
-        nextCoord = goForward(guardPos, dir, gridWidth, gridHeight)
-        if nextCoord == guardPos {
-            break
-        }
-
-        guardPos = nextCoord
+        guardPos = newCoord
     }
-
-    return false
 }
 
 

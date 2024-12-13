@@ -15,9 +15,30 @@ let getColumns filePath =
     |> fun (col1, col2) -> (List.rev col1, List.rev col2)
 
 
-let main = 
-    getColumns "input"
-    |> fun(col1, col2) -> (List.sort(col1), List.sort(col2))
-    |> fun(col1, col2) -> List.map2 (fun n1 n2 -> abs(n1 - n2)) col1 col2
+let task01 (col1, col2) =
+    (List.sort(col1), List.sort(col2))
+    |> fun(col1Sort, col2Sort) -> List.map2 (fun n1 n2 -> abs(n1 - n2)) col1Sort col2Sort
     |> List.sum
+
+
+let task02(col1, col2) =
+    col1
+    |> List.map (fun x -> 
+        col2 
+        |> List.filter (fun y -> y = x)
+        |> List.length
+        |> (*) x
+    )
+    |> List.sum
+
+
+let main = 
+    let (col1, col2) = getColumns "input"
+
+    // Task01
+    task01 (col1, col2)
+    |> printfn "%d"
+
+    // Task02
+    task02 (col1, col2)
     |> printfn "%d"

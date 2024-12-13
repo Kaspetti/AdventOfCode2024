@@ -14,16 +14,16 @@ let lineToIntList (line: string) =
 
 let rec checkUp entry =
     match entry with
-    | prev :: x :: xs -> x > prev && x - prev <= 3 && checkUp (x :: xs)
+    | prev :: x :: xs -> if x > prev && x - prev <= 3 then checkUp (x :: xs) else List.length entry
     | _ :: xs -> checkUp xs
-    | [] -> true
+    | [] -> -1
 
 
 let rec checkDown entry = 
     match entry with
-    | prev :: x :: xs -> x < prev && prev - x <= 3 && checkDown (x :: xs)
+    | prev :: x :: xs -> if x < prev && prev - x <= 3 then checkDown (x :: xs) else List.length entry
     | _ :: xs -> checkDown xs
-    | [] -> true
+    | [] -> -1
 
 
 let readLines path =
@@ -33,7 +33,27 @@ let readLines path =
 
 let task01 entries = 
     entries
-    |> Seq.filter (fun x -> checkUp x || checkDown x)
+    |> Seq.filter (fun x -> checkUp x = -1 || checkDown x = -1)
+    |> Seq.length
+
+
+let task02 entries =
+    entries
+    |> Seq.filter (fun entry ->
+        match checkUp entry with
+        | -1 -> true
+        | up -> 
+            match checkDown entry with
+            | -1 -> true
+            | down ->
+                let faultUpI = List.length entry - up
+                let faultDownI = List.length entry - down
+
+                checkUp (List.removeAt faultUpI entry) = -1 ||
+                checkUp (List.removeAt (faultUpI + 1) entry) = -1 ||
+                checkDown (List.removeAt faultDownI entry) = -1 ||
+                checkDown (List.removeAt (faultDownI + 1) entry) = -1
+    )
     |> Seq.length
 
 
@@ -42,4 +62,8 @@ let main =
 
     // Task01
     task01 entries
-    |> printfn "%d"
+    |> printfn "Task01: %d"
+
+    // Task02
+    task02 entries
+    |> printfn "Task02: %d"
